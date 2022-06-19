@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import { filterImageFromURL, deleteLocalFiles } from './util/util';
 dotenv.config();
 
 (async () => {
@@ -9,14 +9,9 @@ dotenv.config();
   // Init the Express application
   const app = express();
 
-  // Set the network port
-  const port = process.env.PORT || 8081;
-  
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
-  //app.get('/', (req, res) => {
-  //res.send(200)
-  //})
+  app.get('/', (req, res) => { res.status(200).send('hi') });
   // @TODO1 IMPLEMENT A RESTFUL ENDPOINT
   // GET /filteredimage?image_url={{URL}}
   // endpoint to filter an image from a public url.
@@ -33,39 +28,39 @@ dotenv.config();
 
   /**************************************************************************** */
   //enter public url
-  app.get('/filteredimage', async function(req, res) {
-  const {image_url} = req.query
-  //validate image url
-  if(!image_url)
-  {
-    //error handling is placed first to force user to make use of valid url
-    return res.status(400).send("please enter a valid url");
-  }
+  app.get('/filteredimage', async function (req, res) {
+    const { image_url } = req.query
+    //validate image url
+    if (!image_url) {
+      //error handling is placed first to force user to make use of valid url
+      return res.status(400).send("please enter a valid url");
+    }
     //filter picture if image url is valid
     const filteredPicture = await filterImageFromURL(image_url)
     //return filtered picture
     res.status(200).sendFile(filteredPicture);
     //Delete file after response has been sent to use
-    res.on('finish', ()=> {
+    res.on('finish', () => {
       try {
         deleteLocalFiles([filteredPicture]);
-      } catch(e) {
+      } catch (e) {
         console.log("Unable to delete file", filteredPicture);
       }
+    });
   });
-  }); 
   //! END @TODO1
-  
+
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
+  app.get("/", async (req, res) => {
     res.send("try GET /filteredimage?image_url={{}}")
-  } );
-  
+  });
 
-  // Start the Server
-  app.listen( port, () => {
-      console.log( `server running http://localhost:${ port }` );
-      console.log( `press CTRL+C to stop server` );
-  } );
+  const port = process.env.PORT || 8080;
+  app.set('port', port);
+
+  app.listen(app.get('port'), '0.0.0.0', () => {
+    console.info(`HTTP server listening on port ${port}`);
+  });
+
 })();
