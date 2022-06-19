@@ -14,9 +14,9 @@ dotenv.config();
   
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
-  //app.get('/', (req, res) => {
-  //res.send(200)
-  //})
+  app.get('/', (req, res) => {
+  res.send(200)
+  })
   // @TODO1 IMPLEMENT A RESTFUL ENDPOINT
   // GET /filteredimage?image_url={{URL}}
   // endpoint to filter an image from a public url.
@@ -42,7 +42,7 @@ dotenv.config();
     return res.status(400).send("please enter a valid url");
   }
     //filter picture if image url is valid
-    const filteredPicture = await filterImageFromURL(image_url)
+    const filteredPicture = await filterImageFromURL(image_url);
     //return filtered picture
     res.status(200).sendFile(filteredPicture);
     //Delete file after response has been sent to use
@@ -61,8 +61,6 @@ dotenv.config();
   app.get( "/", async ( req, res ) => {
     res.send("try GET /filteredimage?image_url={{}}")
   } );
-  
-
   // Start the Server
   app.listen( port, () => {
       console.log( `server running http://localhost:${ port }` );
